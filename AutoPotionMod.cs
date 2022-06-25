@@ -6,10 +6,6 @@ using System.Collections.Generic;
 using Terraria.UI.Chat;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.GameContent;
-using ReLogic.OS;
-using ReLogic.Localization.IME;
 
 namespace AutoPotion
 {
@@ -31,6 +27,7 @@ namespace AutoPotion
         private Player _player => Main.player[Main.myPlayer];
         private List<Item> _activatedPotion = new List<Item>();
         private List<int> _flaskBuffType = new List<int>() { 71, 73, 74, 75, 76, 77, 78, 79 };
+        private List<int> _foodBuffType = new List<int>() { 26, 206, 207 };
 
         private static AutoPotionMod _instance;
         public static AutoPotionMod Instance => _instance ?? (_instance = new AutoPotionMod());
@@ -67,19 +64,27 @@ namespace AutoPotion
                 On.Terraria.Player.DelBuff -= OnDelBuff;
                 On.Terraria.Player.Spawn -= OnSpawn;
             }
+            _activatedPotion.Clear();
+            _flaskBuffType.Clear();
+            _foodBuffType.Clear();
             _instance = null;
             ToggleAutoPotionKeybind = UseAutoPotionKeybind = null;
         }
 
         private void OnDelBuff(On.Terraria.Player.orig_DelBuff orig, global::Terraria.Player self, int b)
         {
-            var buffType = _player.buffType[b];
+            int buffType = _player.buffType[b];
             orig(self, b);
             if (_toggleActive && self == _player && _activatedPotion.Any(it => it.buffType == buffType))
             {
+                _activatedPotion.RemoveAll(it => it.buffType == buffType);
                 ConsumePotions();
                 if (_activatedPotion.Count == 0)
                     ToggleAutoPotion();
+            }
+            else
+            {
+                _activatedPotion.RemoveAll(it => it.buffType == buffType);
             }
         }
 
@@ -99,7 +104,7 @@ namespace AutoPotion
                     ConsumePotions();
                 else
                     ToggleAutoPotion(false);
-            } 
+            }
         }
 
         public void ToggleAutoPotion(bool sendChat = true)
@@ -155,7 +160,7 @@ namespace AutoPotion
             {
                 if ((items[i].potion || items[i].consumable) && items[i].buffTime != 0 && _player.buffType.Contains(0))
                 {
-                    if (_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0)
+                    if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0) || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0) || _player.buffType.Contains(items[i].buffType))
                         continue;
 
                     if (!_player.buffType.Contains(items[i].buffType))
@@ -197,7 +202,7 @@ namespace AutoPotion
         {
             List<TextSnippet> emptyPotionsSnippets = new List<TextSnippet>();
 
-            foreach (var potion in emptyPotions)
+            foreach (Item potion in emptyPotions)
                 emptyPotionsSnippets.Add(new TextSnippet($"{potion.Name}{(emptyPotions.IndexOf(potion) < emptyPotions.Count - 1 ? ", " : "")}", GetColorFromRare(potion.rare)));
 
             if (emptyPotionsSnippets.Count != 0 && AutoPotionConfig.Instance.PrintEmptyPotions)
@@ -211,7 +216,7 @@ namespace AutoPotion
         {
             if (color == default(Color))
                 color = Color.White;
-            foreach (var line in text.Split('\n'))
+            foreach (string line in text.Split('\n'))
                 Main.NewText(line, color);
         }
 
