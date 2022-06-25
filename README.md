@@ -1,7 +1,9 @@
 # AutoPotion
 
-Auto Potion is a mod which gives a player the ability to automatically consume potions which are located in certain inventories.
-Which can be defined by the user in the mods configurations.
+Auto Potion is a mod which gives a player the ability to automatically consume potions and foods which are located in certain inventories.
+While auto potion is enabled it consumes the potions inside the defined inventory and once the duration of a potion runs out it automatically drinks the potion again.
+
+The mod configurations has the following options.
 
 The inventories are: 
 * Player Inventory
