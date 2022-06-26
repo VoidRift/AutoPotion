@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Terraria.UI.Chat;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Input;
+using System.Text.RegularExpressions;
 
 namespace AutoPotion
 {
@@ -160,8 +161,13 @@ namespace AutoPotion
             {
                 if ((items[i].potion || items[i].consumable) && items[i].buffTime != 0 && _player.buffType.Contains(0))
                 {
-                    if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0) || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0) || _player.buffType.Contains(items[i].buffType))
+                    if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0) || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0))
                         continue;
+                    if (_player.buffType.Contains(items[i].buffType))
+                    {
+                        _activatedPotion.Add(items[i]);
+                        continue;
+                    }
 
                     if (!_player.buffType.Contains(items[i].buffType))
                     {
@@ -208,7 +214,26 @@ namespace AutoPotion
             if (emptyPotionsSnippets.Count != 0 && AutoPotionConfig.Instance.PrintEmptyPotions)
             {
                 emptyPotionsSnippets.Insert(0, new TextSnippet("No potions left of: ", AutoPotionConfig.Instance.PrintColor));
-                SendMultiChat(emptyPotionsSnippets);
+                int splitCounter = 0;
+                int stringCounter = 0;
+                List<List<TextSnippet>> newEmptyPotionsSnippets = new List<List<TextSnippet>>();
+                foreach (TextSnippet snippet in emptyPotionsSnippets)
+                {
+                    if (stringCounter + snippet.Text.Length >= (splitCounter + 1) * 80)
+                    {
+                        splitCounter++;
+                        stringCounter += snippet.Text.Length;
+                    }
+                    else
+                    {
+                        stringCounter += snippet.Text.Length;
+                    }
+                    if (newEmptyPotionsSnippets.Count <= (splitCounter))
+                        newEmptyPotionsSnippets.Add(new List<TextSnippet>());
+                    newEmptyPotionsSnippets.ElementAt(splitCounter).Add(snippet);
+                }
+                foreach (List<TextSnippet> snippets in newEmptyPotionsSnippets)
+                    SendMultiChat(snippets);
             }
         }
 
