@@ -161,11 +161,10 @@ namespace AutoPotion
             {
                 if ((items[i].potion || items[i].consumable) && items[i].buffTime != 0 && _player.buffType.Contains(0))
                 {
-                    if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0) || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0))
-                        continue;
-                    if (_player.buffType.Contains(items[i].buffType))
+                    if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0) || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0) || _player.buffType.Contains(items[i].buffType))
                     {
-                        _activatedPotion.Add(items[i]);
+                        if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
+                            _activatedPotion.Add(items[i]);
                         continue;
                     }
 
