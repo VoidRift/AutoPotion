@@ -16,7 +16,7 @@ namespace AutoPotion
         public AutoPotionInventory AutoPotionInventory { get; set; }
 
         [DefaultValue(false)]
-        [Label("Infinit Potions")]
+        [Label("Infinite Potions")]
         [Tooltip("If enabled no potions will be used but the buff will be applied.")]
         public bool InfinitePotions { get; set; }
 

@@ -159,45 +159,53 @@ namespace AutoPotion
             List<Item> emptyPotions = new List<Item>();
             for (int i = 0; i < items.Length; i++)
             {
-                if ((items[i].potion || items[i].consumable) && items[i].buffTime != 0 && _player.buffType.Contains(0))
+                if ((items[i].potion || items[i].consumable) && items[i].buffTime != 0)
                 {
-                    if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0) || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0) || _player.buffType.Contains(items[i].buffType))
+                    if (_player.buffType.Contains(0))
                     {
-                        if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
-                            _activatedPotion.Add(items[i]);
-                        continue;
-                    }
-
-                    if (!_player.buffType.Contains(items[i].buffType))
-                    {
-                        if (!AutoPotionConfig.Instance.InfinitePotions && items[i].stack <= 1 && !AutoPotionConfig.Instance.UseLastPotion)
+                        if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0) || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0) || _player.buffType.Contains(items[i].buffType))
                         {
-                            _activatedPotion.Remove(items[i]);
-                            emptyPotions.Add(items[i]);
+                            if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
+                                _activatedPotion.Add(items[i]);
                             continue;
                         }
 
-                        _player.AddBuff(items[i].buffType, AutoPotionConfig.Instance.InfinitePotions ? Int32.MaxValue : items[i].buffTime);
-
-                        if (!_activatedPotion.Contains(items[i]))
-                            _activatedPotion.Add(items[i]);
-
-                        if (!AutoPotionConfig.Instance.InfinitePotions)
-                            items[i].stack -= 1;
-                        else
-                            emptyPotions.Clear();
-
-                        if (items[i].stack <= 0)
+                        if (!_player.buffType.Contains(items[i].buffType))
                         {
-                            _activatedPotion.Remove(items[i]);
-                            emptyPotions.Add(items[i]);
-                            items[i] = new Item();
-                            items[i].SetDefaults();
-                            items[i].TurnToAir();
+                            if (!AutoPotionConfig.Instance.InfinitePotions && items[i].stack <= 1 && !AutoPotionConfig.Instance.UseLastPotion)
+                            {
+                                _activatedPotion.Remove(items[i]);
+                                emptyPotions.Add(items[i]);
+                                continue;
+                            }
+
+                            _player.AddBuff(items[i].buffType, AutoPotionConfig.Instance.InfinitePotions ? Int32.MaxValue : items[i].buffTime);
+
+                            if (!_activatedPotion.Contains(items[i]))
+                                _activatedPotion.Add(items[i]);
+
+                            if (!AutoPotionConfig.Instance.InfinitePotions)
+                                items[i].stack -= 1;
+                            else
+                                emptyPotions.Clear();
+
+                            if (items[i].stack <= 0)
+                            {
+                                _activatedPotion.Remove(items[i]);
+                                emptyPotions.Add(items[i]);
+                                items[i] = new Item();
+                                items[i].SetDefaults();
+                                items[i].TurnToAir();
+                            }
                         }
+                        if (_player.buffType.Contains(items[i].buffType) && !_activatedPotion.Contains(items[i]))
+                            _activatedPotion.Add(items[i]);
                     }
-                    if (_player.buffType.Contains(items[i].buffType) && !_activatedPotion.Contains(items[i]))
-                        _activatedPotion.Add(items[i]);
+                    else
+                    {
+                        if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
+                            _activatedPotion.Add(items[i]);
+                    }
                 }
             }
             PrintEmptyPotions(emptyPotions);
