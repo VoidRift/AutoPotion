@@ -185,10 +185,15 @@ namespace AutoPotion
                             if (!_activatedPotion.Contains(items[i]))
                                 _activatedPotion.Add(items[i]);
 
-                            if (!AutoPotionConfig.Instance.InfinitePotions && !bottomlessPotion)
-                                items[i].stack -= 1;
+                            if (!AutoPotionConfig.Instance.InfinitePotions)
+                            {
+                                if (!bottomlessPotion)
+                                    items[i].stack -= 1;
+                            }
                             else
+                            {
                                 emptyPotions.Clear();
+                            }
 
                             if (items[i].stack <= 0)
                             {

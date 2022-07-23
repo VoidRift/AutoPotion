@@ -1,6 +1,6 @@
 displayName = Auto Potion
 author = VoidRift
-version = 0.1.10
+version = 0.1.11
 homepage = https://github.com/VoidRift/AutoPotion
 buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, *.psd, *.sln
 includePDB = true
