@@ -159,7 +159,8 @@ namespace AutoPotion
             List<Item> emptyPotions = new List<Item>();
             for (int i = 0; i < items.Length; i++)
             {
-                if ((items[i].potion || items[i].consumable) && items[i].buffTime != 0)
+                bool bottomlessPotion = items[i].ModItem?.Mod.Name == "BottomlessPotions";
+                if ((items[i].potion || items[i].consumable || bottomlessPotion) && items[i].buffTime != 0)
                 {
                     if (_player.buffType.Contains(0))
                     {
@@ -172,7 +173,7 @@ namespace AutoPotion
 
                         if (!_player.buffType.Contains(items[i].buffType))
                         {
-                            if (!AutoPotionConfig.Instance.InfinitePotions && items[i].stack <= 1 && !AutoPotionConfig.Instance.UseLastPotion)
+                            if (!AutoPotionConfig.Instance.InfinitePotions && items[i].stack <= 1 && !AutoPotionConfig.Instance.UseLastPotion && !bottomlessPotion)
                             {
                                 _activatedPotion.Remove(items[i]);
                                 emptyPotions.Add(items[i]);
@@ -184,7 +185,7 @@ namespace AutoPotion
                             if (!_activatedPotion.Contains(items[i]))
                                 _activatedPotion.Add(items[i]);
 
-                            if (!AutoPotionConfig.Instance.InfinitePotions)
+                            if (!AutoPotionConfig.Instance.InfinitePotions && !bottomlessPotion)
                                 items[i].stack -= 1;
                             else
                                 emptyPotions.Clear();
