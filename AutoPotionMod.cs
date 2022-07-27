@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Terraria.UI.Chat;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Input;
-using System.Text.RegularExpressions;
 
 namespace AutoPotion
 {
@@ -76,17 +75,24 @@ namespace AutoPotion
         {
             int buffType = _player.buffType[b];
             orig(self, b);
-            if (_toggleActive && self == _player && _activatedPotion.Any(it => it.buffType == buffType))
+            if (self == _player)
             {
-                _activatedPotion.RemoveAll(it => it.buffType == buffType);
-                ConsumePotions();
-                if (_activatedPotion.Count == 0)
-                    ToggleAutoPotion();
+                if (!_activatedPotion.Any(it => it.buffType == buffType))
+                    Logger.Info($"Potion with buff: {buffType} was not in activatedPotion list.");
+                if (_toggleActive && _activatedPotion.Any(it => it.buffType == buffType))
+                {
+                    _activatedPotion.RemoveAll(it => it.buffType == buffType);
+                    ConsumePotions();
+                    if (_activatedPotion.Count == 0)
+                        ToggleAutoPotion();
+                }
+                else
+                {
+                    _activatedPotion.RemoveAll(it => it.buffType == buffType);
+                }
             }
             else
-            {
-                _activatedPotion.RemoveAll(it => it.buffType == buffType);
-            }
+                Logger.Info("Is this even possible?");
         }
 
         private void OnDeath(On.Terraria.Player.orig_UpdateDead orig, global::Terraria.Player self)
@@ -168,6 +174,7 @@ namespace AutoPotion
                         {
                             if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
                                 _activatedPotion.Add(items[i]);
+                            Logger.Info($"Potion with buff: {items[i].buffType} not added as it would cause an infinite loop.");
                             continue;
                         }
 
@@ -211,6 +218,7 @@ namespace AutoPotion
                     {
                         if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
                             _activatedPotion.Add(items[i]);
+                        Logger.Info("No remaining buff slots available.");
                     }
                 }
             }
