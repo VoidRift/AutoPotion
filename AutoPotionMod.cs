@@ -83,6 +83,9 @@ namespace AutoPotion
         private void OnDelBuff(On.Terraria.Player.orig_DelBuff orig, global::Terraria.Player self, int b)
         {
             int buffType = _player.buffType[b];
+            //Why does this fix the bug
+            if (buffType == 575)
+                return;
             orig(self, b);
             if (self == _player)
             {
