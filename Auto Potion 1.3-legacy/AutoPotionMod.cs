@@ -27,6 +27,10 @@ namespace AutoPotion
         private List<Item> _activatedPotion = new List<Item>();
         private List<int> _flaskBuffType = new List<int>() { 71, 73, 74, 75, 76, 77, 78, 79 };
         private List<int> _foodBuffType = new List<int>() { 26, 206, 207 };
+        private List<int> _calamityBuffType1 = new List<int>() { 437, 438 };
+        private List<int> _calamityBuffType2 = new List<int>() { 452, 115 };
+        private List<int> _calamityBuffType3 = new List<int>() { 448, 117 };
+        private List<int> _calamityBuffType4 = new List<int>() { 443, 2, 113 };
 
         private static AutoPotionMod _instance;
         public static AutoPotionMod Instance => _instance ?? (_instance = new AutoPotionMod());
@@ -66,24 +70,37 @@ namespace AutoPotion
             _activatedPotion.Clear();
             _flaskBuffType.Clear();
             _foodBuffType.Clear();
+            _calamityBuffType1.Clear();
+            _calamityBuffType2.Clear();
+            _calamityBuffType3.Clear();
+            _calamityBuffType4.Clear();
             _instance = null;
+            _toggleActive = false;
             ToggleAutoPotionKeybind = UseAutoPotionKeybind = null;
         }
 
         private void OnDelBuff(On.Terraria.Player.orig_DelBuff orig, global::Terraria.Player self, int b)
         {
             var buffType = _player.buffType[b];
+            //Why does this fix the bug
+            if (buffType == 575 || buffType == 592)
+                return;
             orig(self, b);
-            if (_toggleActive && self == _player && _activatedPotion.Any(it => it.buffType == buffType))
+            if (self == _player)
             {
-                _activatedPotion.RemoveAll(it => it.buffType == buffType);
-                ConsumePotions();
-                if (_activatedPotion.Count == 0)
-                    ToggleAutoPotion();
-            }
-            else
-            {
-                _activatedPotion.RemoveAll(it => it.buffType == buffType);
+                if (_toggleActive && !_activatedPotion.Any(it => it.buffType == buffType))
+                    Logger.Info($"Potion with buff: {buffType} was not in activatedPotion list.");
+                if (_toggleActive && _activatedPotion.Any(it => it.buffType == buffType))
+                {
+                    _activatedPotion.RemoveAll(it => it.buffType == buffType);
+                    ConsumePotions();
+                    if (_activatedPotion.Count == 0)
+                        ToggleAutoPotion();
+                }
+                else
+                {
+                    _activatedPotion.RemoveAll(it => it.buffType == buffType);
+                }
             }
         }
 
@@ -166,20 +183,29 @@ namespace AutoPotion
             List<Item> emptyPotions = new List<Item>();
             for (int i = 0; i < items.Length; i++)
             {
-                if ((items[i].potion || items[i].consumable) && items[i].buffTime != 0)
+                bool bottomlessPotion = items[i].ModItem?.Mod.Name == "BottomlessPotions";
+                if ((items[i].potion || items[i].consumable || bottomlessPotion) && items[i].buffTime != 0)
                 {
                     if (_player.buffType.Contains(0))
                     {
-                        if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0) || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0) || _player.buffType.Contains(items[i].buffType))
+                        if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0)
+                            || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0)
+                            || (_calamityBuffType1.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType1).Count() > 0)
+                            || (_calamityBuffType2.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType2).Count() > 0)
+                            || (_calamityBuffType3.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType3).Count() > 0)
+                            || (_calamityBuffType4.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType4).Count() > 0)
+                            || _player.buffType.Contains(items[i].buffType))
                         {
                             if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
                                 _activatedPotion.Add(items[i]);
+                            if (!_player.buffType.Contains(items[i].buffType))
+                                Logger.Info($"Potion with buff: {items[i].buffType} not added as it would cause an infinite loop.");
                             continue;
                         }
 
                         if (!_player.buffType.Contains(items[i].buffType))
                         {
-                            if (!AutoPotionConfig.Instance.InfinitePotions && items[i].stack <= 1 && !AutoPotionConfig.Instance.UseLastPotion)
+                            if (!AutoPotionConfig.Instance.InfinitePotions && items[i].stack <= 1 && !AutoPotionConfig.Instance.UseLastPotion && !bottomlessPotion)
                             {
                                 _activatedPotion.Remove(items[i]);
                                 emptyPotions.Add(items[i]);
@@ -192,9 +218,14 @@ namespace AutoPotion
                                 _activatedPotion.Add(items[i]);
 
                             if (!AutoPotionConfig.Instance.InfinitePotions)
-                                items[i].stack -= 1;
+                            {
+                                if (!bottomlessPotion)
+                                    items[i].stack -= 1;
+                            }
                             else
+                            {
                                 emptyPotions.Clear();
+                            }
 
                             if (items[i].stack <= 0)
                             {
@@ -212,6 +243,7 @@ namespace AutoPotion
                     {
                         if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
                             _activatedPotion.Add(items[i]);
+                        Logger.Info("No remaining buff slots available.");
                     }
                 }
             }
