@@ -59,17 +59,17 @@ namespace AutoPotion
             }
         }
 
-        public override void PostAddRecipes()
+        public override void PostSetupContent()
         {
-            base.PostAddRecipes();
+            base.PostSetupContent();
             Mod calamityMod = ModLoader.GetMod("CalamityMod");
 
-            ModItem heartoftheElements = calamityMod.GetItem("HeartoftheElements");
+            ModBuff heartoftheElements = calamityMod.GetBuff("HotE");
             if (heartoftheElements != null)
-                _calamityBrokenTypes.Add(heartoftheElements.item.buffType);
-            ModItem profanedSoulArtifact = calamityMod.GetItem("ProfanedSoulArtifact");
+                _calamityBrokenTypes.Add(heartoftheElements.Type);
+            ModBuff profanedSoulArtifact = calamityMod.GetBuff("ProfanedBabs");
             if (profanedSoulArtifact != null)
-                _calamityBrokenTypes.Add(profanedSoulArtifact.item.buffType);
+                _calamityBrokenTypes.Add(profanedSoulArtifact.Type);
 
             ModItem crumblingPotion = calamityMod.GetItem("CrumblingPotion");
             if (crumblingPotion != null)
@@ -88,7 +88,7 @@ namespace AutoPotion
                 _calamityBuffType3.Add(holyWrathPotion.item.buffType);
             _calamityBuffType3.Add(117); //WrathPotion
 
-            ModItem cadancePotion = calamityMod.GetItem("CadancePotion");
+            ModItem cadancePotion = calamityMod.GetItem("CadencePotion");
             if (cadancePotion != null)
                 _calamityBuffType4.Add(cadancePotion.item.buffType);
             _calamityBuffType4.Add(2); //RegenerationPotion
