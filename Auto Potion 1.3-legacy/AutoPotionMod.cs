@@ -27,10 +27,11 @@ namespace AutoPotion
         private List<Item> _activatedPotion = new List<Item>();
         private List<int> _flaskBuffType = new List<int>() { 71, 73, 74, 75, 76, 77, 78, 79 };
         private List<int> _foodBuffType = new List<int>() { 26, 206, 207 };
-        private List<int> _calamityBuffType1 = new List<int>() { 437, 438 };
-        private List<int> _calamityBuffType2 = new List<int>() { 452, 115 };
-        private List<int> _calamityBuffType3 = new List<int>() { 448, 117 };
-        private List<int> _calamityBuffType4 = new List<int>() { 443, 2, 113 };
+        private List<int> _calamityBuffType1 = new List<int>();
+        private List<int> _calamityBuffType2 = new List<int>();
+        private List<int> _calamityBuffType3 = new List<int>();
+        private List<int> _calamityBuffType4 = new List<int>();
+        private List<int> _calamityBrokenTypes = new List<int>();
 
         private static AutoPotionMod _instance;
         public static AutoPotionMod Instance => _instance ?? (_instance = new AutoPotionMod());
@@ -58,6 +59,42 @@ namespace AutoPotion
             }
         }
 
+        public override void PostAddRecipes()
+        {
+            base.PostAddRecipes();
+            Mod calamityMod = ModLoader.GetMod("CalamityMod");
+
+            ModItem heartoftheElements = calamityMod.GetItem("HeartoftheElements");
+            if (heartoftheElements != null)
+                _calamityBrokenTypes.Add(heartoftheElements.item.buffType);
+            ModItem profanedSoulArtifact = calamityMod.GetItem("ProfanedSoulArtifact");
+            if (profanedSoulArtifact != null)
+                _calamityBrokenTypes.Add(profanedSoulArtifact.item.buffType);
+
+            ModItem crumblingPotion = calamityMod.GetItem("CrumblingPotion");
+            if (crumblingPotion != null)
+                _calamityBuffType1.Add(crumblingPotion.item.buffType);
+            ModItem shatteringPotion = calamityMod.GetItem("ShatteringPotion");
+            if (shatteringPotion != null)
+                _calamityBuffType1.Add(shatteringPotion.item.buffType);
+
+            ModItem profanedRagePotion = calamityMod.GetItem("ProfanedRagePotion");
+            if (profanedRagePotion != null)
+                _calamityBuffType2.Add(profanedRagePotion.item.buffType);
+            _calamityBuffType2.Add(115); //RagePotion
+
+            ModItem holyWrathPotion = calamityMod.GetItem("HolyWrathPotion");
+            if (holyWrathPotion != null)
+                _calamityBuffType3.Add(holyWrathPotion.item.buffType);
+            _calamityBuffType3.Add(117); //WrathPotion
+
+            ModItem cadancePotion = calamityMod.GetItem("CadancePotion");
+            if (cadancePotion != null)
+                _calamityBuffType4.Add(cadancePotion.item.buffType);
+            _calamityBuffType4.Add(2); //RegenerationPotion
+            _calamityBuffType4.Add(113); //LifeforcePotion
+        }
+
         public override void Unload()
         {
             base.Unload();
@@ -74,6 +111,7 @@ namespace AutoPotion
             _calamityBuffType2.Clear();
             _calamityBuffType3.Clear();
             _calamityBuffType4.Clear();
+            _calamityBrokenTypes.Clear();
             _instance = null;
             _toggleActive = false;
             ToggleAutoPotionKeybind = UseAutoPotionKeybind = null;
@@ -83,7 +121,7 @@ namespace AutoPotion
         {
             var buffType = _player.buffType[b];
             //Why does this fix the bug
-            if (buffType == 575 || buffType == 592)
+            if (_calamityBrokenTypes.Contains(buffType))
                 return;
             orig(self, b);
             if (self == _player)
@@ -183,8 +221,7 @@ namespace AutoPotion
             List<Item> emptyPotions = new List<Item>();
             for (int i = 0; i < items.Length; i++)
             {
-                bool bottomlessPotion = items[i].ModItem?.Mod.Name == "BottomlessPotions";
-                if ((items[i].potion || items[i].consumable || bottomlessPotion) && items[i].buffTime != 0)
+                if ((items[i].potion || items[i].consumable) && items[i].buffTime != 0)
                 {
                     if (_player.buffType.Contains(0))
                     {
@@ -205,7 +242,7 @@ namespace AutoPotion
 
                         if (!_player.buffType.Contains(items[i].buffType))
                         {
-                            if (!AutoPotionConfig.Instance.InfinitePotions && items[i].stack <= 1 && !AutoPotionConfig.Instance.UseLastPotion && !bottomlessPotion)
+                            if (!AutoPotionConfig.Instance.InfinitePotions && items[i].stack <= 1 && !AutoPotionConfig.Instance.UseLastPotion)
                             {
                                 _activatedPotion.Remove(items[i]);
                                 emptyPotions.Add(items[i]);
@@ -218,14 +255,9 @@ namespace AutoPotion
                                 _activatedPotion.Add(items[i]);
 
                             if (!AutoPotionConfig.Instance.InfinitePotions)
-                            {
-                                if (!bottomlessPotion)
-                                    items[i].stack -= 1;
-                            }
+                                items[i].stack -= 1;
                             else
-                            {
                                 emptyPotions.Clear();
-                            }
 
                             if (items[i].stack <= 0)
                             {

@@ -28,10 +28,11 @@ namespace AutoPotion
         private List<Item> _activatedPotion = new List<Item>();
         private List<int> _flaskBuffType = new List<int>() { 71, 73, 74, 75, 76, 77, 78, 79 };
         private List<int> _foodBuffType = new List<int>() { 26, 206, 207 };
-        private List<int> _calamityBuffType1 = new List<int>() { 437, 438 };
-        private List<int> _calamityBuffType2 = new List<int>() { 452, 115 };
-        private List<int> _calamityBuffType3 = new List<int>() { 448, 117 };
-        private List<int> _calamityBuffType4 = new List<int>() { 443, 2, 113 };
+        private List<int> _calamityBuffType1 = new List<int>();
+        private List<int> _calamityBuffType2 = new List<int>();
+        private List<int> _calamityBuffType3 = new List<int>();
+        private List<int> _calamityBuffType4 = new List<int>();
+        private List<int> _calamityBrokenTypes = new List<int>();
 
         private static AutoPotionMod _instance;
         public static AutoPotionMod Instance => _instance ?? (_instance = new AutoPotionMod());
@@ -59,6 +60,37 @@ namespace AutoPotion
             }
         }
 
+        public override void PostSetupContent()
+        {
+            base.PostSetupContent();
+            Mod calamityMod = ModLoader.GetMod("CalamityMod");
+            List<ModItem> calamityModItems = calamityMod.GetContent<ModItem>().ToList();
+            List<ModBuff> calamityModBuffs = calamityMod.GetContent<ModBuff>().ToList();
+
+            if (calamityModBuffs.FirstOrDefault(it => it.Name == "HotE") is { } heartoftheElements)
+                _calamityBrokenTypes.Add(heartoftheElements.Type);
+            if (calamityModBuffs.FirstOrDefault(it => it.Name == "ProfanedBabs") is { } profanedSoulArtifact)
+                _calamityBrokenTypes.Add(profanedSoulArtifact.Type);
+
+            if (calamityModItems.FirstOrDefault(it => it.Name == "CrumblingPotion") is { } crumblingPotion)
+                _calamityBuffType1.Add(crumblingPotion.Item.buffType);
+            if (calamityModItems.FirstOrDefault(it => it.Name == "ShatteringPotion") is { } shatteringPotion)
+                _calamityBuffType1.Add(shatteringPotion.Item.buffType);
+
+            if (calamityModItems.FirstOrDefault(it => it.Name == "ProfanedRagePotion") is { } profanedRagePotion)
+                _calamityBuffType2.Add(profanedRagePotion.Item.buffType);
+            _calamityBuffType2.Add(115); //RagePotion
+
+            if (calamityModItems.FirstOrDefault(it => it.Name == "HolyWrathPotion") is { } holyWrathPotion)
+                _calamityBuffType3.Add(holyWrathPotion.Item.buffType);
+            _calamityBuffType3.Add(117); //WrathPotion
+
+            if (calamityModItems.FirstOrDefault(it => it.Name == "CadancePotion") is { } cadancePotion)
+                _calamityBuffType4.Add(cadancePotion.Item.buffType);
+            _calamityBuffType4.Add(2); //RegenerationPotion
+            _calamityBuffType4.Add(113); //LifeforcePotion
+        }
+
         public override void Unload()
         {
             base.Unload();
@@ -75,6 +107,7 @@ namespace AutoPotion
             _calamityBuffType2.Clear();
             _calamityBuffType3.Clear();
             _calamityBuffType4.Clear();
+            _calamityBrokenTypes.Clear();
             _instance = null;
             _toggleActive = false;
             ToggleAutoPotionKeybind = UseAutoPotionKeybind = null;
@@ -84,7 +117,7 @@ namespace AutoPotion
         {
             int buffType = _player.buffType[b];
             //Why does this fix the bug
-            if (buffType == 575 || buffType == 592)
+            if (_calamityBrokenTypes.Contains(buffType))
                 return;
             orig(self, b);
             if (self == _player)
