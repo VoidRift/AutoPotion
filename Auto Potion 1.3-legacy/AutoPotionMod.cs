@@ -63,36 +63,38 @@ namespace AutoPotion
         {
             base.PostSetupContent();
             Mod calamityMod = ModLoader.GetMod("CalamityMod");
+            if (calamityMod != null)
+            {
+                ModBuff heartoftheElements = calamityMod.GetBuff("HotE");
+                if (heartoftheElements != null)
+                    _calamityBrokenTypes.Add(heartoftheElements.Type);
+                ModBuff profanedSoulArtifact = calamityMod.GetBuff("ProfanedBabs");
+                if (profanedSoulArtifact != null)
+                    _calamityBrokenTypes.Add(profanedSoulArtifact.Type);
 
-            ModBuff heartoftheElements = calamityMod.GetBuff("HotE");
-            if (heartoftheElements != null)
-                _calamityBrokenTypes.Add(heartoftheElements.Type);
-            ModBuff profanedSoulArtifact = calamityMod.GetBuff("ProfanedBabs");
-            if (profanedSoulArtifact != null)
-                _calamityBrokenTypes.Add(profanedSoulArtifact.Type);
+                ModItem crumblingPotion = calamityMod.GetItem("CrumblingPotion");
+                if (crumblingPotion != null)
+                    _calamityBuffType1.Add(crumblingPotion.item.buffType);
+                ModItem shatteringPotion = calamityMod.GetItem("ShatteringPotion");
+                if (shatteringPotion != null)
+                    _calamityBuffType1.Add(shatteringPotion.item.buffType);
 
-            ModItem crumblingPotion = calamityMod.GetItem("CrumblingPotion");
-            if (crumblingPotion != null)
-                _calamityBuffType1.Add(crumblingPotion.item.buffType);
-            ModItem shatteringPotion = calamityMod.GetItem("ShatteringPotion");
-            if (shatteringPotion != null)
-                _calamityBuffType1.Add(shatteringPotion.item.buffType);
+                ModItem profanedRagePotion = calamityMod.GetItem("ProfanedRagePotion");
+                if (profanedRagePotion != null)
+                    _calamityBuffType2.Add(profanedRagePotion.item.buffType);
+                _calamityBuffType2.Add(115); //RagePotion
 
-            ModItem profanedRagePotion = calamityMod.GetItem("ProfanedRagePotion");
-            if (profanedRagePotion != null)
-                _calamityBuffType2.Add(profanedRagePotion.item.buffType);
-            _calamityBuffType2.Add(115); //RagePotion
+                ModItem holyWrathPotion = calamityMod.GetItem("HolyWrathPotion");
+                if (holyWrathPotion != null)
+                    _calamityBuffType3.Add(holyWrathPotion.item.buffType);
+                _calamityBuffType3.Add(117); //WrathPotion
 
-            ModItem holyWrathPotion = calamityMod.GetItem("HolyWrathPotion");
-            if (holyWrathPotion != null)
-                _calamityBuffType3.Add(holyWrathPotion.item.buffType);
-            _calamityBuffType3.Add(117); //WrathPotion
-
-            ModItem cadancePotion = calamityMod.GetItem("CadencePotion");
-            if (cadancePotion != null)
-                _calamityBuffType4.Add(cadancePotion.item.buffType);
-            _calamityBuffType4.Add(2); //RegenerationPotion
-            _calamityBuffType4.Add(113); //LifeforcePotion
+                ModItem cadancePotion = calamityMod.GetItem("CadencePotion");
+                if (cadancePotion != null)
+                    _calamityBuffType4.Add(cadancePotion.item.buffType);
+                _calamityBuffType4.Add(2); //RegenerationPotion
+                _calamityBuffType4.Add(113); //LifeforcePotion
+            }
         }
 
         public override void Unload()

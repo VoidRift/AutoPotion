@@ -63,32 +63,34 @@ namespace AutoPotion
         public override void PostSetupContent()
         {
             base.PostSetupContent();
-            Mod calamityMod = ModLoader.GetMod("CalamityMod");
-            List<ModItem> calamityModItems = calamityMod.GetContent<ModItem>().ToList();
-            List<ModBuff> calamityModBuffs = calamityMod.GetContent<ModBuff>().ToList();
+            if (ModLoader.TryGetMod("CalamityMod", out Mod calamityMod))
+            {
+                List<ModItem> calamityModItems = calamityMod.GetContent<ModItem>().ToList();
+                List<ModBuff> calamityModBuffs = calamityMod.GetContent<ModBuff>().ToList();
 
-            if (calamityModBuffs.FirstOrDefault(it => it.Name == "HotE") is { } heartoftheElements)
-                _calamityBrokenTypes.Add(heartoftheElements.Type);
-            if (calamityModBuffs.FirstOrDefault(it => it.Name == "ProfanedBabs") is { } profanedSoulArtifact)
-                _calamityBrokenTypes.Add(profanedSoulArtifact.Type);
+                if (calamityModBuffs.FirstOrDefault(it => it.Name == "HotE") is { } heartoftheElements)
+                    _calamityBrokenTypes.Add(heartoftheElements.Type);
+                if (calamityModBuffs.FirstOrDefault(it => it.Name == "ProfanedBabs") is { } profanedSoulArtifact)
+                    _calamityBrokenTypes.Add(profanedSoulArtifact.Type);
 
-            if (calamityModItems.FirstOrDefault(it => it.Name == "CrumblingPotion") is { } crumblingPotion)
-                _calamityBuffType1.Add(crumblingPotion.Item.buffType);
-            if (calamityModItems.FirstOrDefault(it => it.Name == "ShatteringPotion") is { } shatteringPotion)
-                _calamityBuffType1.Add(shatteringPotion.Item.buffType);
+                if (calamityModItems.FirstOrDefault(it => it.Name == "CrumblingPotion") is { } crumblingPotion)
+                    _calamityBuffType1.Add(crumblingPotion.Item.buffType);
+                if (calamityModItems.FirstOrDefault(it => it.Name == "ShatteringPotion") is { } shatteringPotion)
+                    _calamityBuffType1.Add(shatteringPotion.Item.buffType);
 
-            if (calamityModItems.FirstOrDefault(it => it.Name == "ProfanedRagePotion") is { } profanedRagePotion)
-                _calamityBuffType2.Add(profanedRagePotion.Item.buffType);
-            _calamityBuffType2.Add(115); //RagePotion
+                if (calamityModItems.FirstOrDefault(it => it.Name == "ProfanedRagePotion") is { } profanedRagePotion)
+                    _calamityBuffType2.Add(profanedRagePotion.Item.buffType);
+                _calamityBuffType2.Add(115); //RagePotion
 
-            if (calamityModItems.FirstOrDefault(it => it.Name == "HolyWrathPotion") is { } holyWrathPotion)
-                _calamityBuffType3.Add(holyWrathPotion.Item.buffType);
-            _calamityBuffType3.Add(117); //WrathPotion
+                if (calamityModItems.FirstOrDefault(it => it.Name == "HolyWrathPotion") is { } holyWrathPotion)
+                    _calamityBuffType3.Add(holyWrathPotion.Item.buffType);
+                _calamityBuffType3.Add(117); //WrathPotion
 
-            if (calamityModItems.FirstOrDefault(it => it.Name == "CadancePotion") is { } cadancePotion)
-                _calamityBuffType4.Add(cadancePotion.Item.buffType);
-            _calamityBuffType4.Add(2); //RegenerationPotion
-            _calamityBuffType4.Add(113); //LifeforcePotion
+                if (calamityModItems.FirstOrDefault(it => it.Name == "CadancePotion") is { } cadancePotion)
+                    _calamityBuffType4.Add(cadancePotion.Item.buffType);
+                _calamityBuffType4.Add(2); //RegenerationPotion
+                _calamityBuffType4.Add(113); //LifeforcePotion
+            }
         }
 
         public override void Unload()
