@@ -14,7 +14,8 @@ namespace AutoPotion
         PlayerInventory,
         PiggyBank,
         Safe,
-        DefendersForge
+        DefendersForge,
+        VoidVault
     }
 
     public class AutoPotionMod : Mod
@@ -204,6 +205,9 @@ namespace AutoPotion
                     break;
                 case AutoPotionInventory.DefendersForge:
                     items = _player.bank3.item;
+                    break;
+                case AutoPotionInventory.VoidVault:
+                    items = _player.bank4.item;
                     break;
             }
 
