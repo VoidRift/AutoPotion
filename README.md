@@ -10,6 +10,7 @@ The inventories are:
 * Bank
 * Safe
 * Defender's Forge
+* Void Vault
 
 There are also multiple config options for this mod like:
 * Infinite potions ***This can be allowed/disallowed by the server***
