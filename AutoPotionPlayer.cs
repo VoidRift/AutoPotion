@@ -1,4 +1,6 @@
-﻿using Terraria.GameInput;
+﻿using Terraria.Audio;
+using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace AutoPotion
@@ -11,9 +13,14 @@ namespace AutoPotion
             if (Mod is AutoPotionMod AutoPotionMod)
             {
                 if (AutoPotionMod.ToggleAutoPotionKeybind.JustPressed)
+                {
                     AutoPotionMod.ToggleAutoPotion();
+                }
                 else if (AutoPotionMod.UseAutoPotionKeybind.JustPressed)
+                {
                     AutoPotionMod.ConsumePotions();
+                    SoundEngine.PlaySound(SoundID.Item3, Player.position);
+                }
             }
         }
     }
