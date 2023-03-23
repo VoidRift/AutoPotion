@@ -189,8 +189,9 @@ namespace AutoPotion
                 new TextSnippet(_toggleActive ? "Enabled" : "Disabled", _toggleActive ? new Color(0, 255, 0) : new Color(255, 0, 0))};
         }
 
-        public void ConsumePotions()
+        public bool ConsumePotions()
         {
+            bool usedPostion = false;
             Item[] items = new Item[0];
             switch (AutoPotionConfig.Instance.AutoPotionInventory)
             {
@@ -245,6 +246,8 @@ namespace AutoPotion
 
                             _player.AddBuff(items[i].buffType, AutoPotionConfig.Instance.InfinitePotions ? Int32.MaxValue : items[i].buffTime);
 
+                            usedPostion = true;
+
                             if (!_activatedPotion.Contains(items[i]))
                                 _activatedPotion.Add(items[i]);
 
@@ -279,6 +282,7 @@ namespace AutoPotion
                 }
             }
             PrintEmptyPotions(emptyPotions);
+            return usedPostion;
         }
 
         private void PrintEmptyPotions(List<Item> emptyPotions)

@@ -18,8 +18,11 @@ namespace AutoPotion
                 }
                 else if (AutoPotionMod.UseAutoPotionKeybind.JustPressed)
                 {
-                    AutoPotionMod.ConsumePotions();
-                    SoundEngine.PlaySound(SoundID.Item3, Player.position);
+                    bool usedPostion = AutoPotionMod.ConsumePotions();
+                    if (usedPostion)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item3, Player.position);
+                    }
                 }
             }
         }
