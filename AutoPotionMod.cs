@@ -32,7 +32,7 @@ namespace AutoPotion
         private List<int> _calamityBuffType1 = new List<int>();
         private List<int> _calamityBuffType2 = new List<int>();
         private List<int> _calamityBuffType3 = new List<int>();
-        private List<int> _calamityBuffType4 = new List<int>();
+        private Dictionary<int, int> _calamityBuffType4 = new Dictionary<int, int>();
         private List<int> _calamityBrokenTypes = new List<int>();
 
         private static AutoPotionMod _instance;
@@ -70,27 +70,36 @@ namespace AutoPotion
                 List<ModBuff> calamityModBuffs = calamityMod.GetContent<ModBuff>().ToList();
 
                 if (calamityModBuffs.FirstOrDefault(it => it.Name == "HotE") is { } heartoftheElements)
+                {
                     _calamityBrokenTypes.Add(heartoftheElements.Type);
+                }
                 if (calamityModBuffs.FirstOrDefault(it => it.Name == "ProfanedBabs") is { } profanedSoulArtifact)
+                {
                     _calamityBrokenTypes.Add(profanedSoulArtifact.Type);
-
+                }
                 if (calamityModItems.FirstOrDefault(it => it.Name == "CrumblingPotion") is { } crumblingPotion)
+                {
                     _calamityBuffType1.Add(crumblingPotion.Item.buffType);
+                }
                 if (calamityModItems.FirstOrDefault(it => it.Name == "ShatteringPotion") is { } shatteringPotion)
+                {
                     _calamityBuffType1.Add(shatteringPotion.Item.buffType);
-
+                }
                 if (calamityModItems.FirstOrDefault(it => it.Name == "ProfanedRagePotion") is { } profanedRagePotion)
+                {
                     _calamityBuffType2.Add(profanedRagePotion.Item.buffType);
-                _calamityBuffType2.Add(115); //RagePotion
-
+                    _calamityBuffType2.Add(115); //RagePotion
+                }
                 if (calamityModItems.FirstOrDefault(it => it.Name == "HolyWrathPotion") is { } holyWrathPotion)
+                {
                     _calamityBuffType3.Add(holyWrathPotion.Item.buffType);
-                _calamityBuffType3.Add(117); //WrathPotion
-
+                    _calamityBuffType3.Add(117); //WrathPotion
+                }
                 if (calamityModItems.FirstOrDefault(it => it.Name == "CadancePotion") is { } cadancePotion)
-                    _calamityBuffType4.Add(cadancePotion.Item.buffType);
-                _calamityBuffType4.Add(2); //RegenerationPotion
-                _calamityBuffType4.Add(113); //LifeforcePotion
+                {
+                    _calamityBuffType4.Add(cadancePotion.Item.buffType, 2); //RegenerationPotion
+                    _calamityBuffType4.Add(cadancePotion.Item.buffType, 113); //LifeforcePotion
+                }
             }
         }
 
@@ -225,7 +234,7 @@ namespace AutoPotion
                             || (_calamityBuffType1.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType1).Count() > 0)
                             || (_calamityBuffType2.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType2).Count() > 0)
                             || (_calamityBuffType3.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType3).Count() > 0)
-                            || (_calamityBuffType4.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType4).Count() > 0)
+                            || (_calamityBuffType4.ContainsKey(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType4.Values).Count() > 0)
                             || _player.buffType.Contains(items[i].buffType))
                         {
                             if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
