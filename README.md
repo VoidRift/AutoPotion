@@ -17,10 +17,10 @@ There are also multiple config options for this mod like:
 * Use last potion
 * Disable on death
 * Print empty potions & print color
-* Increase the maximum number of available buffs (default in terraria is 22) ***This is a server only option. Works on Single-player aswell***
+* Increase the maximum number of available buffs (default in Terraria is 22 or 44 as of 1.4.4) ***This is a server only option. Works on Single-player as well***
 
 There are also 2 keybind options.
 * ```Toggle auto potion``` which enables or disables the auto potion consumption
-* ```Single use potion``` which is similar to the default terraria keybind ```B``` which consumes all potions which are located in the defined inventory
+* ```Single use potion``` which is similar to the default Terraria keybind ```B``` which consumes all potions which are located in the defined inventory
 
 ### Feel free to post issues or suggestions to the [Issues page](https://github.com/VoidRift/AutoPotion/issues)
