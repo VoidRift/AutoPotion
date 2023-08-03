@@ -1,0 +1,63 @@
+Keybinds: {
+	ToggleAutoPotion.DisplayName: Toggle auto potion
+	UsePotion.DisplayName: Single use potion
+}
+
+Configs: {
+	AutoPotionConfig: {
+		DisplayName: Auto Potion Config
+
+		AutoPotionInventory: {
+			Label: Auto Potion Inventory
+			Tooltip: This is where the mod will look for potions to use.
+		}
+
+		InfinitePotions: {
+			Label: Infinite Potions
+			Tooltip: If enabled no potions will be used but the buff will be applied.
+		}
+
+		UseLastPotion: {
+			Label: Use Last Potion
+			Tooltip: If the potion count is 1 and it is enabled the last potion will not be used.
+		}
+
+		DisableOnDeath: {
+			Label: Disable On Death
+			Tooltip: If the player dies or leaves the server auto potion will be disabled.
+		}
+
+		PrintEmptyPotions: {
+			Label: Print Empty Potions
+			Tooltip: If no more potions are left of a type it will post it into the local chat.
+		}
+
+		PrintColor: {
+			Label: Print Color
+			Tooltip: Text color of text in chat.
+		}
+	}
+
+	AutoPotionInventory: {
+		Tooltip: ""
+		PlayerInventory.Label: Player Inventory
+		PiggyBank.Label: Piggy Bank
+		Safe.Label: Safe
+		DefendersForge.Label: Defenders Forge
+		VoidVault.Label: Void Vault
+	}
+
+	AutoPotionConfigServer: {
+		DisplayName: Auto Potion Config Server
+
+		ExtraPlayerBuffSlots: {
+			Label: Extra Player Buff Slots
+			Tooltip: Increases the maximum number of buff slots available.
+		}
+
+		InfinitePotionsAllowed: {
+			Label: Infinite Potions Allowed
+			Tooltip: Allows a user to toggle InfinitePotions
+		}
+	}
+}

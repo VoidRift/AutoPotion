@@ -18,8 +18,7 @@ namespace AutoPotion
                 }
                 else if (AutoPotionMod.UseAutoPotionKeybind.JustPressed)
                 {
-                    bool usedPostion = AutoPotionMod.ConsumePotions();
-                    if (usedPostion)
+                    if (AutoPotionMod.ConsumePotions())
                     {
                         SoundEngine.PlaySound(SoundID.Item3, Player.position);
                     }

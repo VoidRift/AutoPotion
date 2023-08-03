@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AutoPotion
 {
-    enum AutoPotionInventory
+    public enum AutoPotionInventory
     {
         PlayerInventory,
         PiggyBank,
@@ -20,11 +20,6 @@ namespace AutoPotion
 
     public class AutoPotionMod : Mod
     {
-        private static string TOGGLE_AUTO_POTION = "Toggle auto potion";
-        private static string USE_POTION = "Single use potion";
-
-        private bool _toggleActive = false;
-
         private Player _player => Main.player[Main.myPlayer];
         private List<Item> _activatedPotion = new List<Item>();
         private List<int> _flaskBuffType = new List<int>() { 71, 73, 74, 75, 76, 77, 78, 79 };
@@ -34,6 +29,7 @@ namespace AutoPotion
         private List<int> _calamityBuffType3 = new List<int>();
         private Dictionary<int, int> _calamityBuffType4 = new Dictionary<int, int>();
         private List<int> _calamityBrokenTypes = new List<int>();
+        private bool _toggleActive = false;
 
         private static AutoPotionMod _instance;
         public static AutoPotionMod Instance => _instance ?? (_instance = new AutoPotionMod());
@@ -53,11 +49,11 @@ namespace AutoPotion
             base.Load();
             if (!Main.dedServ)
             {
-                ToggleAutoPotionKeybind = KeybindLoader.RegisterKeybind(this, TOGGLE_AUTO_POTION, Keys.None);
-                UseAutoPotionKeybind = KeybindLoader.RegisterKeybind(this, USE_POTION, Keys.None);
-                On.Terraria.Player.UpdateDead += OnDeath;
-                On.Terraria.Player.DelBuff += OnDelBuff;
-                On.Terraria.Player.Spawn += OnSpawn;
+                ToggleAutoPotionKeybind = KeybindLoader.RegisterKeybind(this, "ToggleAutoPotion", Keys.None);
+                UseAutoPotionKeybind = KeybindLoader.RegisterKeybind(this, "UsePotion", Keys.None);
+                On_Player.UpdateDead += OnDeath;
+                On_Player.DelBuff += OnDelBuff;
+                On_Player.Spawn += OnSpawn;
             }
         }
 
@@ -108,9 +104,9 @@ namespace AutoPotion
             base.Unload();
             if (!Main.dedServ)
             {
-                On.Terraria.Player.UpdateDead -= OnDeath;
-                On.Terraria.Player.DelBuff -= OnDelBuff;
-                On.Terraria.Player.Spawn -= OnSpawn;
+                On_Player.UpdateDead -= OnDeath;
+                On_Player.DelBuff -= OnDelBuff;
+                On_Player.Spawn -= OnSpawn;
             }
             _activatedPotion.Clear();
             _flaskBuffType.Clear();
@@ -125,23 +121,29 @@ namespace AutoPotion
             ToggleAutoPotionKeybind = UseAutoPotionKeybind = null;
         }
 
-        private void OnDelBuff(On.Terraria.Player.orig_DelBuff orig, global::Terraria.Player self, int b)
+        private void OnDelBuff(On_Player.orig_DelBuff orig,Player self, int b)
         {
             int buffType = _player.buffType[b];
-            //Why does this fix the bug
+            //Why does this fix a bug with calamity buffs
             if (_calamityBrokenTypes.Contains(buffType))
+            {
                 return;
+            }
             orig(self, b);
             if (self == _player)
             {
                 if (_toggleActive && !_activatedPotion.Any(it => it.buffType == buffType))
+                {
                     Logger.Info($"Potion with buff: {buffType} was not in activatedPotion list.");
+                }
                 if (_toggleActive && _activatedPotion.Any(it => it.buffType == buffType))
                 {
                     _activatedPotion.RemoveAll(it => it.buffType == buffType);
                     ConsumePotions();
                     if (_activatedPotion.Count == 0)
+                    {
                         ToggleAutoPotion();
+                    }
                 }
                 else
                 {
@@ -150,22 +152,28 @@ namespace AutoPotion
             }
         }
 
-        private void OnDeath(On.Terraria.Player.orig_UpdateDead orig, global::Terraria.Player self)
+        private void OnDeath(On_Player.orig_UpdateDead orig, Player self)
         {
             orig(self);
             if (_toggleActive && self == _player && AutoPotionConfig.Instance.DisableOnDeath)
+            {
                 ToggleAutoPotion();
+            }
         }
 
-        private void OnSpawn(On.Terraria.Player.orig_Spawn orig, global::Terraria.Player self, PlayerSpawnContext context)
+        private void OnSpawn(On_Player.orig_Spawn orig, Player self, PlayerSpawnContext context)
         {
             orig(self, context);
             if (_toggleActive && self == _player)
             {
                 if (!AutoPotionConfig.Instance.DisableOnDeath)
+                {
                     ConsumePotions();
+                }
                 else
+                {
                     ToggleAutoPotion(false);
+                }
             }
         }
 
@@ -176,18 +184,21 @@ namespace AutoPotion
             {
                 ConsumePotions();
                 if (_activatedPotion.Count != 0)
+                {
                     SendMultiChat(GetAutomaticToggleText());
+                }
                 else
                 {
-                    SendMultiChat(new List<TextSnippet>() { new TextSnippet("Automatic potion drinking ", AutoPotionConfig.Instance.PrintColor),
-                        new TextSnippet("Not Enabled", new Color(255, 0, 0)) });
+                    SendMultiChat(new List<TextSnippet>() { new TextSnippet("Automatic potion drinking ", AutoPotionConfig.Instance.PrintColor), new TextSnippet("Not Enabled", new Color(255, 0, 0)) });
                     _toggleActive = !_toggleActive;
                 }
             }
             else
             {
                 if (sendChat)
+                {
                     SendMultiChat(GetAutomaticToggleText());
+                }
                 _activatedPotion.Clear();
             }
         }
@@ -238,9 +249,13 @@ namespace AutoPotion
                             || _player.buffType.Contains(items[i].buffType))
                         {
                             if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
+                            {
                                 _activatedPotion.Add(items[i]);
+                            }
                             if (!_player.buffType.Contains(items[i].buffType))
+                            {
                                 Logger.Info($"Potion with buff: {items[i].buffType} not added as it would cause an infinite loop.");
+                            }
                             continue;
                         }
 
@@ -258,7 +273,9 @@ namespace AutoPotion
                             usedPostion = true;
 
                             if (!_activatedPotion.Contains(items[i]))
+                            {
                                 _activatedPotion.Add(items[i]);
+                            }
 
                             if (!AutoPotionConfig.Instance.InfinitePotions)
                             {
@@ -280,13 +297,18 @@ namespace AutoPotion
                             }
                         }
                         if (_player.buffType.Contains(items[i].buffType) && !_activatedPotion.Contains(items[i]))
+                        {
                             _activatedPotion.Add(items[i]);
+                        }
                     }
                     else
                     {
                         if (!_activatedPotion.Any(it => it.buffType == items[i].buffType))
+                        {
                             _activatedPotion.Add(items[i]);
+                        }
                         Logger.Info("No remaining buff slots available.");
+                        break;
                     }
                 }
             }
@@ -297,10 +319,10 @@ namespace AutoPotion
         private void PrintEmptyPotions(List<Item> emptyPotions)
         {
             List<TextSnippet> emptyPotionsSnippets = new List<TextSnippet>();
-
             foreach (Item potion in emptyPotions)
+            {
                 emptyPotionsSnippets.Add(new TextSnippet($"{potion.Name}{(emptyPotions.IndexOf(potion) < emptyPotions.Count - 1 ? ", " : "")}", GetColorFromRare(potion.rare)));
-
+            }
             if (emptyPotionsSnippets.Count != 0 && AutoPotionConfig.Instance.PrintEmptyPotions)
             {
                 emptyPotionsSnippets.Insert(0, new TextSnippet("No potions left of: ", AutoPotionConfig.Instance.PrintColor));
@@ -319,27 +341,37 @@ namespace AutoPotion
                         stringCounter += snippet.Text.Length;
                     }
                     if (newEmptyPotionsSnippets.Count <= (splitCounter))
+                    {
                         newEmptyPotionsSnippets.Add(new List<TextSnippet>());
+                    }
                     newEmptyPotionsSnippets.ElementAt(splitCounter).Add(snippet);
                 }
                 foreach (List<TextSnippet> snippets in newEmptyPotionsSnippets)
+                {
                     SendMultiChat(snippets);
+                }
             }
         }
 
         private void SendChat(string text, Color color = default)
         {
             if (color == default(Color))
+            {
                 color = Color.White;
+            }
             foreach (string line in text.Split('\n'))
+            {
                 Main.NewText(line, color);
+            }
         }
 
         private void SendMultiChat(List<TextSnippet> textSnippets)
         {
             string newText = "";
             foreach (TextSnippet snippet in textSnippets)
+            {
                 newText += $"[c/{Utils.Hex3(snippet.Color)}: {snippet.Text}]";
+            }
             Main.NewText(newText);
         }
 
