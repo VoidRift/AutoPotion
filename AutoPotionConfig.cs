@@ -17,6 +17,9 @@ namespace AutoPotion
         public bool InfinitePotions { get; set; }
 
         [DefaultValue(false)]
+        public bool RemovePotionSickness { get; set; }
+
+        [DefaultValue(false)]
         public bool UseLastPotion { get; set; }
 
         [DefaultValue(true)]
@@ -35,6 +38,10 @@ namespace AutoPotion
             {
                 InfinitePotions = false;
             }
+            if (RemovePotionSickness && AutoPotionConfigServer.Instance != null && !AutoPotionConfigServer.Instance.RemovePotionSicknessAllowed)
+            {
+                RemovePotionSickness = false;
+            }
         }
     }
 
@@ -52,5 +59,9 @@ namespace AutoPotion
         [DefaultValue(false)]
         [ReloadRequired]
         public bool InfinitePotionsAllowed { get; set; }
+
+        [DefaultValue(false)]
+        [ReloadRequired]
+        public bool RemovePotionSicknessAllowed { get; set; }
     }
 }

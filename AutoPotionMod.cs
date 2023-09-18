@@ -1,11 +1,12 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria;
-using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using Terraria.UI.Chat;
+using Terraria.ID;
 using Terraria.ModLoader;
-using Microsoft.Xna.Framework.Input;
+using Terraria.UI.Chat;
 
 namespace AutoPotion
 {
@@ -22,14 +23,15 @@ namespace AutoPotion
     {
         private Player _player => Main.player[Main.myPlayer];
         private List<Item> _activatedPotion = new List<Item>();
-        private List<int> _flaskBuffType = new List<int>() { 71, 73, 74, 75, 76, 77, 78, 79 };
-        private List<int> _foodBuffType = new List<int>() { 26, 206, 207 };
+        private List<int> _flaskBuffType = new List<int>() { BuffID.WeaponImbueVenom, BuffID.WeaponImbueCursedFlames, BuffID.WeaponImbueFire, BuffID.WeaponImbueGold, BuffID.WeaponImbueIchor, BuffID.WeaponImbueNanites, BuffID.WeaponImbueConfetti, BuffID.WeaponImbuePoison };
+        private List<int> _foodBuffType = new List<int>() { BuffID.WellFed, BuffID.WellFed2, BuffID.WellFed3 };
         private List<int> _calamityBuffType1 = new List<int>();
         private List<int> _calamityBuffType2 = new List<int>();
         private List<int> _calamityBuffType3 = new List<int>();
         private Dictionary<int, int> _calamityBuffType4 = new Dictionary<int, int>();
         private List<int> _calamityBrokenTypes = new List<int>();
         private bool _toggleActive = false;
+        private int? _previousPotionDelay;
 
         private static AutoPotionMod _instance;
         public static AutoPotionMod Instance => _instance ?? (_instance = new AutoPotionMod());
@@ -53,7 +55,13 @@ namespace AutoPotion
                 UseAutoPotionKeybind = KeybindLoader.RegisterKeybind(this, "UsePotion", Keys.None);
                 On_Player.UpdateDead += OnDeath;
                 On_Player.DelBuff += OnDelBuff;
+                On_Player.AddBuff += OnAddBuff;
                 On_Player.Spawn += OnSpawn;
+                if (AutoPotionConfig.Instance.RemovePotionSickness)
+                {
+                    _previousPotionDelay = Item.potionDelay;
+                    Item.potionDelay = 0;
+                }
             }
         }
 
@@ -84,17 +92,17 @@ namespace AutoPotion
                 if (calamityModItems.FirstOrDefault(it => it.Name == "ProfanedRagePotion") is { } profanedRagePotion)
                 {
                     _calamityBuffType2.Add(profanedRagePotion.Item.buffType);
-                    _calamityBuffType2.Add(115); //RagePotion
+                    _calamityBuffType2.Add(BuffID.Rage);
                 }
                 if (calamityModItems.FirstOrDefault(it => it.Name == "HolyWrathPotion") is { } holyWrathPotion)
                 {
                     _calamityBuffType3.Add(holyWrathPotion.Item.buffType);
-                    _calamityBuffType3.Add(117); //WrathPotion
+                    _calamityBuffType3.Add(BuffID.Wrath);
                 }
                 if (calamityModItems.FirstOrDefault(it => it.Name == "CadancePotion") is { } cadancePotion)
                 {
-                    _calamityBuffType4.Add(cadancePotion.Item.buffType, 2); //RegenerationPotion
-                    _calamityBuffType4.Add(cadancePotion.Item.buffType, 113); //LifeforcePotion
+                    _calamityBuffType4.Add(cadancePotion.Item.buffType, BuffID.Regeneration);
+                    _calamityBuffType4.Add(cadancePotion.Item.buffType, BuffID.Lifeforce);
                 }
             }
         }
@@ -106,7 +114,12 @@ namespace AutoPotion
             {
                 On_Player.UpdateDead -= OnDeath;
                 On_Player.DelBuff -= OnDelBuff;
+                On_Player.AddBuff -= OnAddBuff;
                 On_Player.Spawn -= OnSpawn;
+                if (_previousPotionDelay.HasValue)
+                {
+                    Item.potionDelay = _previousPotionDelay.Value;
+                }
             }
             _activatedPotion.Clear();
             _flaskBuffType.Clear();
@@ -121,7 +134,7 @@ namespace AutoPotion
             ToggleAutoPotionKeybind = UseAutoPotionKeybind = null;
         }
 
-        private void OnDelBuff(On_Player.orig_DelBuff orig,Player self, int b)
+        private void OnDelBuff(On_Player.orig_DelBuff orig, Player self, int b)
         {
             int buffType = _player.buffType[b];
             //Why does this fix a bug with calamity buffs
@@ -149,6 +162,14 @@ namespace AutoPotion
                 {
                     _activatedPotion.RemoveAll(it => it.buffType == buffType);
                 }
+            }
+        }
+        
+        private void OnAddBuff(On_Player.orig_AddBuff orig, Player self, int type, int timeToAdd, bool quiet, bool foodHack)
+        {
+            if (!AutoPotionConfig.Instance.RemovePotionSickness || type != BuffID.PotionSickness)
+            {
+                orig(self, type, timeToAdd, quiet, foodHack);
             }
         }
 
@@ -268,7 +289,7 @@ namespace AutoPotion
                                 continue;
                             }
 
-                            _player.AddBuff(items[i].buffType, AutoPotionConfig.Instance.InfinitePotions ? Int32.MaxValue : items[i].buffTime);
+                            _player.AddBuff(items[i].buffType, AutoPotionConfig.Instance.InfinitePotions ? int.MaxValue : items[i].buffTime);
 
                             usedPostion = true;
 

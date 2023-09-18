@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 
 namespace AutoPotion
 {
-	public class AutoPotionPlayer : ModPlayer
+    public class AutoPotionPlayer : ModPlayer
 	{
         public override void ProcessTriggers(TriggersSet triggersSet)
         {

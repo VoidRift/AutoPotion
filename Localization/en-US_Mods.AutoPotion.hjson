@@ -9,32 +9,37 @@ Configs: {
 
 		AutoPotionInventory: {
 			Label: Auto Potion Inventory
-			Tooltip: This is where the mod will look for potions to use.
+			Tooltip: This is where the mod will look for potions to use
 		}
 
 		InfinitePotions: {
 			Label: Infinite Potions
-			Tooltip: If enabled no potions will be used but the buff will be applied.
+			Tooltip: If enabled no potions will be used but the buff will be applied
 		}
 
 		UseLastPotion: {
 			Label: Use Last Potion
-			Tooltip: If the potion count is 1 and it is enabled the last potion will not be used.
+			Tooltip: If the potion count is 1 and it is enabled the last potion will not be used
+		}
+
+		RemovePotionSickness: {
+			Label: Remove Potion Sickness
+			Tooltip: Removes the Potion Sickness effect
 		}
 
 		DisableOnDeath: {
 			Label: Disable On Death
-			Tooltip: If the player dies or leaves the server auto potion will be disabled.
+			Tooltip: If the player dies or leaves the server auto potion will be disabled
 		}
 
 		PrintEmptyPotions: {
 			Label: Print Empty Potions
-			Tooltip: If no more potions are left of a type it will post it into the local chat.
+			Tooltip: If no more potions are left of a type it will post it into the local chat
 		}
 
 		PrintColor: {
 			Label: Print Color
-			Tooltip: Text color of text in chat.
+			Tooltip: Text color of text in chat
 		}
 	}
 
@@ -52,12 +57,17 @@ Configs: {
 
 		ExtraPlayerBuffSlots: {
 			Label: Extra Player Buff Slots
-			Tooltip: Increases the maximum number of buff slots available.
+			Tooltip: Increases the maximum number of buff slots available
 		}
 
 		InfinitePotionsAllowed: {
 			Label: Infinite Potions Allowed
 			Tooltip: Allows a user to toggle InfinitePotions
+		}
+
+		RemovePotionSicknessAllowed: {
+			Label: Remove Potion Sickness Allowed
+			Tooltip: Allows a user to toggle RemovePotionSickness
 		}
 	}
 }
