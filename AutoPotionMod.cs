@@ -25,6 +25,7 @@ namespace AutoPotion
         private List<Item> _activatedPotion = new List<Item>();
         private List<int> _flaskBuffType = new List<int>() { BuffID.WeaponImbueVenom, BuffID.WeaponImbueCursedFlames, BuffID.WeaponImbueFire, BuffID.WeaponImbueGold, BuffID.WeaponImbueIchor, BuffID.WeaponImbueNanites, BuffID.WeaponImbueConfetti, BuffID.WeaponImbuePoison };
         private List<int> _foodBuffType = new List<int>() { BuffID.WellFed, BuffID.WellFed2, BuffID.WellFed3 };
+        private List<int> _calamityFlaskBuffType = new List<int>();
         private List<int> _calamityBuffType1 = new List<int>();
         private List<int> _calamityBuffType2 = new List<int>();
         private List<int> _calamityBuffType3 = new List<int>();
@@ -73,36 +74,48 @@ namespace AutoPotion
                 List<ModItem> calamityModItems = calamityMod.GetContent<ModItem>().ToList();
                 List<ModBuff> calamityModBuffs = calamityMod.GetContent<ModBuff>().ToList();
 
-                if (calamityModBuffs.FirstOrDefault(it => it.Name == "HotE") is { } heartoftheElements)
+                foreach (ModBuff modBuff in calamityModBuffs)
                 {
-                    _calamityBrokenTypes.Add(heartoftheElements.Type);
+                    if (modBuff.Name == "HotE")
+                    {
+                        _calamityBrokenTypes.Add(modBuff.Type); //Heart of the Elements (https://calamitymod.wiki.gg/wiki/Heart_of_the_Elements)
+                    }
+                    else if (modBuff.Name == "ProfanedSoulGuardians" || modBuff.Name == "ProfanedBabs")
+                    {
+                        _calamityBrokenTypes.Add(modBuff.Type); //Profaned Soul Guardians (https://calamitymod.wiki.gg/wiki/Profaned_Soul_Artifact)
+                    }
                 }
-                if (calamityModBuffs.FirstOrDefault(it => it.Name == "ProfanedBabs") is { } profanedSoulArtifact)
+                foreach (ModItem modItem in calamityModItems)
                 {
-                    _calamityBrokenTypes.Add(profanedSoulArtifact.Type);
-                }
-                if (calamityModItems.FirstOrDefault(it => it.Name == "CrumblingPotion") is { } crumblingPotion)
-                {
-                    _calamityBuffType1.Add(crumblingPotion.Item.buffType);
-                }
-                if (calamityModItems.FirstOrDefault(it => it.Name == "ShatteringPotion") is { } shatteringPotion)
-                {
-                    _calamityBuffType1.Add(shatteringPotion.Item.buffType);
-                }
-                if (calamityModItems.FirstOrDefault(it => it.Name == "ProfanedRagePotion") is { } profanedRagePotion)
-                {
-                    _calamityBuffType2.Add(profanedRagePotion.Item.buffType);
-                    _calamityBuffType2.Add(BuffID.Rage);
-                }
-                if (calamityModItems.FirstOrDefault(it => it.Name == "HolyWrathPotion") is { } holyWrathPotion)
-                {
-                    _calamityBuffType3.Add(holyWrathPotion.Item.buffType);
-                    _calamityBuffType3.Add(BuffID.Wrath);
-                }
-                if (calamityModItems.FirstOrDefault(it => it.Name == "CadancePotion") is { } cadancePotion)
-                {
-                    _calamityBuffType4.Add(cadancePotion.Item.buffType, BuffID.Regeneration);
-                    _calamityBuffType4.Add(cadancePotion.Item.buffType, BuffID.Lifeforce);
+                    if (modItem.Name == "FlaskOfCrumbling" || modItem.Name == "CrumblingPotion") //Flask of Crumbling (https://calamitymod.wiki.gg/wiki/Flask_of_Crumbling)
+                    {
+                        _calamityBuffType1.Add(modItem.Item.buffType);
+                        _calamityFlaskBuffType.Add(modItem.Item.buffType);
+                    }
+                    else if (modItem.Name == "FlaskOfBrimstone") //Flask of Brimstone (https://calamitymod.wiki.gg/wiki/Flask_of_Brimstone)
+                    {
+                        _calamityFlaskBuffType.Add(modItem.Item.buffType);
+                    }
+                    else if (modItem.Name == "FlaskOfHolyFlames" || modItem.Name == "HolyWrathPotion") //Flask of Holy Flames (https://calamitymod.wiki.gg/wiki/Flask_of_Holy_Flames)
+                    {
+                        _calamityFlaskBuffType.Add(modItem.Item.buffType);
+                        _calamityBuffType3.Add(modItem.Item.buffType);
+                        _calamityBuffType3.Add(BuffID.Wrath);
+                    }
+                    else if (modItem.Name == "ShatteringPotion") //Shattering Potion (https://calamitymod.wiki.gg/wiki/Shattering_Potion) (2.0.2.001: Removed)
+                    {
+                        _calamityBuffType1.Add(modItem.Item.buffType);
+                    }
+                    else if (modItem.Name == "ProfanedRagePotion") //Profaned Rage Potion (https://calamitymod.wiki.gg/wiki/Profaned_Rage_Potion) (2.0.2.001: Removed)
+                    {
+                        _calamityBuffType2.Add(modItem.Item.buffType);
+                        _calamityBuffType2.Add(BuffID.Rage);
+                    }
+                    else if (modItem.Name == "CadancePotion") //Cadance Potion (https://calamitymod.wiki.gg/wiki/Cadance_Potion) (2.0.2.001: Removed)
+                    {
+                        _calamityBuffType4.Add(modItem.Item.buffType, BuffID.Regeneration);
+                        _calamityBuffType4.Add(modItem.Item.buffType, BuffID.Lifeforce);
+                    }
                 }
             }
         }
@@ -124,6 +137,7 @@ namespace AutoPotion
             _activatedPotion.Clear();
             _flaskBuffType.Clear();
             _foodBuffType.Clear();
+            _calamityFlaskBuffType.Clear();
             _calamityBuffType1.Clear();
             _calamityBuffType2.Clear();
             _calamityBuffType3.Clear();
@@ -263,6 +277,7 @@ namespace AutoPotion
                     {
                         if ((_flaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_flaskBuffType).Count() > 0)
                             || (_foodBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_foodBuffType).Count() > 0)
+                            || (_calamityFlaskBuffType.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityFlaskBuffType).Count() > 0)
                             || (_calamityBuffType1.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType1).Count() > 0)
                             || (_calamityBuffType2.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType2).Count() > 0)
                             || (_calamityBuffType3.Contains(items[i].buffType) && _player.buffType.Intersect(_calamityBuffType3).Count() > 0)
