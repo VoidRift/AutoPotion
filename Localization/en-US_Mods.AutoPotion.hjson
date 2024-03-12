@@ -9,7 +9,7 @@ Configs: {
 
 		AutoPotionInventory: {
 			Label: Auto Potion Inventory
-			Tooltip: This is where the mod will look for potions to use
+			Tooltip: The inventory where for potions will be searched for
 		}
 
 		InfinitePotions: {
@@ -32,6 +32,11 @@ Configs: {
 			Tooltip: If the player dies or leaves the server auto potion will be disabled
 		}
 
+		WhitelistMode: {
+			Label: Whitelist Mode
+			Tooltip: Only potions which are manually used or are active will be comsumed if they run out
+		}
+
 		PrintEmptyPotions: {
 			Label: Print Empty Potions
 			Tooltip: If no more potions are left of a type it will post it into the local chat
@@ -39,7 +44,7 @@ Configs: {
 
 		PrintColor: {
 			Label: Print Color
-			Tooltip: Text color of text in chat
+			Tooltip: Text color in chat
 		}
 	}
 

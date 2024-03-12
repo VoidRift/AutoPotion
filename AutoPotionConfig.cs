@@ -25,6 +25,9 @@ namespace AutoPotion
         [DefaultValue(true)]
         public bool DisableOnDeath { get; set; }
 
+        [DefaultValue(false)]
+        public bool WhitelistMode { get; set; }
+
         [DefaultValue(true)]
         public bool PrintEmptyPotions { get; set; }
 
