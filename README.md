@@ -16,6 +16,7 @@ There are also multiple config options for this mod like:
 * Infinite potions ***This can be allowed/disallowed by the server***
 * Use last potion
 * Disable on death ***This can be allowed/disallowed by the server***
+* Whitelist Mode
 * Print empty potions & print color
 * Increase the maximum number of available buffs (default in Terraria is 22 or 44 as of 1.4.4) ***This is a server only option. Works on Single-player as well***
 
