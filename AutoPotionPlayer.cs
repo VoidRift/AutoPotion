@@ -25,5 +25,14 @@ namespace AutoPotion
                 }
             }
         }
+
+        public override void PreUpdateBuffs()
+        {
+            base.PreUpdateBuffs();
+            if (AutoPotionConfig.Instance.RemovePotionSickness)
+            {
+                Player.potionDelayTime = 0;
+            }
+        }
     }
 }

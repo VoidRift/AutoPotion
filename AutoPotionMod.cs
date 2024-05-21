@@ -34,7 +34,6 @@ namespace AutoPotion
         private Dictionary<int, int> _calamityBuffType4 = new Dictionary<int, int>();
         private List<int> _calamityBrokenTypes = new List<int>();
         private bool _toggleActive = false;
-        private int? _previousPotionDelay;
 
         private static AutoPotionMod _instance;
         public static AutoPotionMod Instance => _instance ?? (_instance = new AutoPotionMod());
@@ -60,11 +59,6 @@ namespace AutoPotion
                 On_Player.AddBuff += OnAddBuff;
                 On_Player.DelBuff += OnDelBuff;
                 On_Player.Spawn += OnSpawn;
-                if (AutoPotionConfig.Instance.RemovePotionSickness)
-                {
-                    _previousPotionDelay = Item.potionDelay;
-                    Item.potionDelay = 0;
-                }
             }
         }
 
@@ -131,10 +125,6 @@ namespace AutoPotion
                 On_Player.AddBuff -= OnAddBuff;
                 On_Player.DelBuff -= OnDelBuff;
                 On_Player.Spawn -= OnSpawn;
-                if (_previousPotionDelay.HasValue)
-                {
-                    Item.potionDelay = _previousPotionDelay.Value;
-                }
             }
             _activatedPotion.Clear();
             _ignoredPotion.Clear();
