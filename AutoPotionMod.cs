@@ -94,9 +94,17 @@ namespace AutoPotion
                     }
                     else if (modItem.Name == "FlaskOfHolyFlames" || modItem.Name == "HolyWrathPotion") //Flask of Holy Flames (https://calamitymod.wiki.gg/wiki/Flask_of_Holy_Flames)
                     {
-                        _calamityFlaskBuffType.Add(modItem.Item.buffType);
-                        _calamityBuffType3.Add(modItem.Item.buffType);
-                        _calamityBuffType3.Add(BuffID.Wrath);
+                        int version = calamityMod.Version.Major * 1000 + calamityMod.Version.Minor * 100 + calamityMod.Version.Build * 10 + calamityMod.Version.Revision;
+                        if (version >= 2021)
+                        {
+                            _calamityFlaskBuffType.Add(modItem.Item.buffType);
+                        }
+                        else
+                        {
+                            _calamityFlaskBuffType.Add(modItem.Item.buffType);
+                            _calamityBuffType3.Add(modItem.Item.buffType);
+                            _calamityBuffType3.Add(BuffID.Wrath);
+                        }
                     }
                     else if (modItem.Name == "ShatteringPotion") //Shattering Potion (https://calamitymod.wiki.gg/wiki/Shattering_Potion) (2.0.2.001: Removed)
                     {
