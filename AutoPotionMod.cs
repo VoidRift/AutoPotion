@@ -244,7 +244,7 @@ namespace AutoPotion
         private void OnSpawn(On_Player.orig_Spawn orig, Player self, PlayerSpawnContext context)
         {
             orig(self, context);
-            if (_toggleActive && self == _player)
+            if (_toggleActive && self == _player && context != PlayerSpawnContext.RecallFromItem)
             {
                 if (!AutoPotionConfig.Instance.DisableOnDeath)
                 {
